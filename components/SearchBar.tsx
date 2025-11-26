@@ -13,7 +13,7 @@ const SearchBar = ({onPress, placeholder}:{onPress?: () => void, placeholder:str
         value=''
         onChangeText={()=>{}}
         placeholderTextColor="#a8b5db"
-        className=' ml-2 text-white'
+        className='ml-2 text-white'
      />
     </View>
   )
