@@ -9,13 +9,15 @@ const client = new Client()
         .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!)
 
 const tablesDB = new TablesDB(client);
+
 export const updateSearchCount = async (query:string, movie:Movie)=>{
     try{
+    const normalizedQuery = query.toLowerCase();
     const result = await tablesDB.listRows({
         databaseId: DATABASE_ID,
         tableId: TABLE_ID,
         queries: [
-            Query.equal('searchTerm',query)
+            Query.equal('searchTerm', normalizedQuery)
         ]
     })
     console.log('this is the result ', result)
@@ -32,13 +34,33 @@ export const updateSearchCount = async (query:string, movie:Movie)=>{
             }
         )
     } else {
+         const result = await tablesDB.listRows({
+            databaseId: DATABASE_ID,
+            tableId: TABLE_ID,
+            queries: [
+                Query.equal('movie_id',  movie.id)
+            ]
+        })
+        if(result.rows.length>0){
+        const existingMovie = result.rows[0];
+        await tablesDB.updateRow(
+            {
+                databaseId: DATABASE_ID,
+                tableId: TABLE_ID,
+                rowId: existingMovie.$id,
+                data:{
+                    count: existingMovie.count + 1
+                }
+            }
+        )
+    }else{
         await tablesDB.createRow(
             {
                 databaseId: DATABASE_ID,
                 tableId: TABLE_ID,
                 rowId: ID.unique(),
                 data:{
-                    searchTerm: query,
+                    searchTerm: normalizedQuery,
                     movie_id: movie.id,
                     count:1,
                     poster_url: process.env.EXPO_PUBLIC_IMAGE_BASE_URL+movie.poster_path,
@@ -47,7 +69,27 @@ export const updateSearchCount = async (query:string, movie:Movie)=>{
             }
         )
     }
+    }
 }catch(e){
     console.log('error on update search count ', e)
 }
+}
+
+export const getTrendingMovies = async (): Promise <TrendingMovie[] | undefined> => {
+    try {
+          const result = await tablesDB.listRows({
+                databaseId: DATABASE_ID,
+                tableId: TABLE_ID,
+                queries: [
+                    Query.limit(5),
+                    Query.orderDesc('count')
+                ]
+            })
+            const data: unknown = result.rows;
+
+                return data as TrendingMovie[];
+    } catch(e){
+        console.log('error occured ', e)
+        return undefined
+    }
 }

@@ -34,6 +34,11 @@ const search = () => {
 
     return () => clearTimeout(timeoutId)
     }, [searchTerm])
+        useEffect(()=>{
+           if(movies?.length>0 && movies?.[0]){
+            updateSearchCount(searchTerm, movies[0])
+         }
+    }, [movies])
   return (
     <View className="flex-1 bg-primary">
       <Image source={images.bg} className='flex-1 absolute w-full z-0' resizeMode='cover'/>
