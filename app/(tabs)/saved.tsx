@@ -1,11 +1,13 @@
 import React from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 
 const saved = () => {
   return (
-    <View>
-      <Text>saved</Text>
-    </View>
+      <View className='bg-primary flex-1 px-10'>
+         <View className=''>
+   
+         </View>
+       </View>
   )
 }
 
